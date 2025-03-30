@@ -10,26 +10,36 @@ import (
 	"database/sql"
 )
 
-const createPerson = `-- name: CreatePerson :execresult
+const createPerson = `-- name: CreatePerson :one
 INSERT INTO persons (
   email,
   full_name,
-  chosen_course_id
+  course_id
 ) VALUES (
   ?,
   ?,
   ?
 )
+RETURNING id, email, full_name, course_id, created_at
 `
 
 type CreatePersonParams struct {
-	Email          sql.NullString `json:"email"`
-	FullName       string         `json:"full_name"`
-	ChosenCourseID int64          `json:"chosen_course_id"`
+	Email    sql.NullString `json:"email"`
+	FullName string         `json:"full_name"`
+	CourseID int64          `json:"course_id"`
 }
 
-func (q *Queries) CreatePerson(ctx context.Context, arg CreatePersonParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, createPerson, arg.Email, arg.FullName, arg.ChosenCourseID)
+func (q *Queries) CreatePerson(ctx context.Context, arg CreatePersonParams) (Person, error) {
+	row := q.db.QueryRowContext(ctx, createPerson, arg.Email, arg.FullName, arg.CourseID)
+	var i Person
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.FullName,
+		&i.CourseID,
+		&i.CreatedAt,
+	)
+	return i, err
 }
 
 const deletePerson = `-- name: DeletePerson :execresult
@@ -42,7 +52,7 @@ func (q *Queries) DeletePerson(ctx context.Context, id int64) (sql.Result, error
 }
 
 const getPerson = `-- name: GetPerson :one
-SELECT id, email, full_name, chosen_course_id, created_at
+SELECT id, email, full_name, course_id, created_at
 FROM persons
 WHERE id = ?
 `
@@ -54,14 +64,14 @@ func (q *Queries) GetPerson(ctx context.Context, id int64) (Person, error) {
 		&i.ID,
 		&i.Email,
 		&i.FullName,
-		&i.ChosenCourseID,
+		&i.CourseID,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const getPersonByEmail = `-- name: GetPersonByEmail :one
-SELECT id, email, full_name, chosen_course_id, created_at
+SELECT id, email, full_name, course_id, created_at
 FROM persons
 WHERE email = ?
 `
@@ -73,14 +83,14 @@ func (q *Queries) GetPersonByEmail(ctx context.Context, email sql.NullString) (P
 		&i.ID,
 		&i.Email,
 		&i.FullName,
-		&i.ChosenCourseID,
+		&i.CourseID,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const listPersons = `-- name: ListPersons :many
-SELECT id, email, full_name, chosen_course_id, created_at
+SELECT id, email, full_name, course_id, created_at
 FROM persons
 ORDER BY full_name
 `
@@ -98,7 +108,7 @@ func (q *Queries) ListPersons(ctx context.Context) ([]Person, error) {
 			&i.ID,
 			&i.Email,
 			&i.FullName,
-			&i.ChosenCourseID,
+			&i.CourseID,
 			&i.CreatedAt,
 		); err != nil {
 			return nil, err
@@ -118,37 +128,37 @@ const updatePerson = `-- name: UpdatePerson :execresult
 UPDATE persons
 SET email = ?,
     full_name = ?,
-    chosen_course_id = ?
+    course_id = ?
 WHERE id = ?
 `
 
 type UpdatePersonParams struct {
-	Email          sql.NullString `json:"email"`
-	FullName       string         `json:"full_name"`
-	ChosenCourseID int64          `json:"chosen_course_id"`
-	ID             int64          `json:"id"`
+	Email    sql.NullString `json:"email"`
+	FullName string         `json:"full_name"`
+	CourseID int64          `json:"course_id"`
+	ID       int64          `json:"id"`
 }
 
 func (q *Queries) UpdatePerson(ctx context.Context, arg UpdatePersonParams) (sql.Result, error) {
 	return q.db.ExecContext(ctx, updatePerson,
 		arg.Email,
 		arg.FullName,
-		arg.ChosenCourseID,
+		arg.CourseID,
 		arg.ID,
 	)
 }
 
-const updatePersonChosenCourse = `-- name: UpdatePersonChosenCourse :execresult
+const updatePersonCourse = `-- name: UpdatePersonCourse :execresult
 UPDATE persons
-SET chosen_course_id = ?
+SET course_id = ?
 WHERE id = ?
 `
 
-type UpdatePersonChosenCourseParams struct {
-	ChosenCourseID int64 `json:"chosen_course_id"`
-	ID             int64 `json:"id"`
+type UpdatePersonCourseParams struct {
+	CourseID int64 `json:"course_id"`
+	ID       int64 `json:"id"`
 }
 
-func (q *Queries) UpdatePersonChosenCourse(ctx context.Context, arg UpdatePersonChosenCourseParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, updatePersonChosenCourse, arg.ChosenCourseID, arg.ID)
+func (q *Queries) UpdatePersonCourse(ctx context.Context, arg UpdatePersonCourseParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, updatePersonCourse, arg.CourseID, arg.ID)
 }

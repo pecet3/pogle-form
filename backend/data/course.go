@@ -11,6 +11,6 @@ func (c Course) ToDto(d *Queries) *dtos.Course {
 		ID:               int(c.ID),
 		Name:             c.Name,
 		MaxPersons:       int(c.MaxPersons),
-		RegisterdPersons: int(rp.(int64)),
+		RegisterdPersons: int(rp),
 	}
 }

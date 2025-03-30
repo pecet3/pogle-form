@@ -28,6 +28,7 @@ func Run(
 	}
 	authRouter.Run(app)
 
-	app.Srv.HandleFunc("/", r.handleViewForm)
 	app.Srv.HandleFunc(POST+"/persons", r.handleCreatePerson)
+
+	app.Srv.HandleFunc("GET /", r.handleViewForm)
 }

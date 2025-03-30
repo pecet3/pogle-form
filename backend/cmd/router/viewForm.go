@@ -25,7 +25,7 @@ func (r router) handleViewForm(w http.ResponseWriter, req *http.Request) {
 		Title:   os.Getenv("FORM_TITLE"),
 	}
 
-	coursesDB, err := r.app.Data.GetAllCourses(req.Context())
+	coursesDB, err := r.app.Data.ListCourses(req.Context())
 	if err != nil {
 		logger.Error(err)
 		http.Error(w, "", http.StatusInternalServerError)
@@ -38,7 +38,6 @@ func (r router) handleViewForm(w http.ResponseWriter, req *http.Request) {
 		}
 		coursesData.Courses = append(coursesData.Courses, cp)
 	}
-
 	tmpl, err := template.ParseFiles("static/course_register.html")
 	if err != nil {
 		logger.Error(err)

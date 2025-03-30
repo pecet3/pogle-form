@@ -10,25 +10,6 @@ import (
 	"database/sql"
 )
 
-const createChosenCourse = `-- name: CreateChosenCourse :execresult
-INSERT INTO chosen_courses (
-  person_id,
-  course_id
-) VALUES (
-  ?,
-  ?
-)
-`
-
-type CreateChosenCourseParams struct {
-	PersonID int64 `json:"person_id"`
-	CourseID int64 `json:"course_id"`
-}
-
-func (q *Queries) CreateChosenCourse(ctx context.Context, arg CreateChosenCourseParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, createChosenCourse, arg.PersonID, arg.CourseID)
-}
-
 const createChosenReservedCourse = `-- name: CreateChosenReservedCourse :execresult
 INSERT INTO chosen_reserved_courses (
   person_id,
@@ -67,33 +48,6 @@ func (q *Queries) CreateCourse(ctx context.Context, arg CreateCourseParams) (sql
 	return q.db.ExecContext(ctx, createCourse, arg.Name, arg.MaxPersons)
 }
 
-const deleteChosenCourse = `-- name: DeleteChosenCourse :execresult
-DELETE FROM chosen_courses
-WHERE id = ?
-`
-
-func (q *Queries) DeleteChosenCourse(ctx context.Context, id int64) (sql.Result, error) {
-	return q.db.ExecContext(ctx, deleteChosenCourse, id)
-}
-
-const deleteChosenCoursesByCourseID = `-- name: DeleteChosenCoursesByCourseID :execresult
-DELETE FROM chosen_courses
-WHERE course_id = ?
-`
-
-func (q *Queries) DeleteChosenCoursesByCourseID(ctx context.Context, courseID int64) (sql.Result, error) {
-	return q.db.ExecContext(ctx, deleteChosenCoursesByCourseID, courseID)
-}
-
-const deleteChosenCoursesByPersonID = `-- name: DeleteChosenCoursesByPersonID :execresult
-DELETE FROM chosen_courses
-WHERE person_id = ?
-`
-
-func (q *Queries) DeleteChosenCoursesByPersonID(ctx context.Context, personID int64) (sql.Result, error) {
-	return q.db.ExecContext(ctx, deleteChosenCoursesByPersonID, personID)
-}
-
 const deleteChosenReservedCourse = `-- name: DeleteChosenReservedCourse :execresult
 DELETE FROM chosen_reserved_courses
 WHERE id = ?
@@ -130,63 +84,12 @@ func (q *Queries) DeleteCourse(ctx context.Context, id int64) (sql.Result, error
 	return q.db.ExecContext(ctx, deleteCourse, id)
 }
 
-const getAllCourses = `-- name: GetAllCourses :many
-SELECT id, name, max_persons, created_at
-FROM courses
-ORDER BY name
-`
-
-func (q *Queries) GetAllCourses(ctx context.Context) ([]Course, error) {
-	rows, err := q.db.QueryContext(ctx, getAllCourses)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Course
-	for rows.Next() {
-		var i Course
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.MaxPersons,
-			&i.CreatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getChosenCourse = `-- name: GetChosenCourse :one
-
-SELECT id, person_id, course_id
-FROM chosen_courses
-WHERE id = ?
-`
-
-// chosen_courses table queries
-func (q *Queries) GetChosenCourse(ctx context.Context, id int64) (ChosenCourse, error) {
-	row := q.db.QueryRowContext(ctx, getChosenCourse, id)
-	var i ChosenCourse
-	err := row.Scan(&i.ID, &i.PersonID, &i.CourseID)
-	return i, err
-}
-
 const getChosenReservedCourse = `-- name: GetChosenReservedCourse :one
-
 SELECT id, person_id, course_id
 FROM chosen_reserved_courses
 WHERE id = ?
 `
 
-// chosen_reserved_courses table queries
 func (q *Queries) GetChosenReservedCourse(ctx context.Context, id int64) (ChosenReservedCourse, error) {
 	row := q.db.QueryRowContext(ctx, getChosenReservedCourse, id)
 	var i ChosenReservedCourse
@@ -195,13 +98,11 @@ func (q *Queries) GetChosenReservedCourse(ctx context.Context, id int64) (Chosen
 }
 
 const getCourse = `-- name: GetCourse :one
-
 SELECT id, name, max_persons, created_at
 FROM courses
 WHERE id = ?
 `
 
-// courses table queries
 func (q *Queries) GetCourse(ctx context.Context, id int64) (Course, error) {
 	row := q.db.QueryRowContext(ctx, getCourse, id)
 	var i Course
@@ -216,80 +117,20 @@ func (q *Queries) GetCourse(ctx context.Context, id int64) (Course, error) {
 
 const getNumberOfPersonsInCourse = `-- name: GetNumberOfPersonsInCourse :one
 SELECT
-  COALESCE(COUNT(cc.person_id), 0) AS number_of_persons
+  COUNT(p.id) AS number_of_persons
 FROM
   courses c
 LEFT JOIN
-  chosen_courses cc ON c.id = cc.course_id
+  persons p ON c.id = p.course_id
 WHERE
   c.id = ?
 `
 
-func (q *Queries) GetNumberOfPersonsInCourse(ctx context.Context, id int64) (interface{}, error) {
+func (q *Queries) GetNumberOfPersonsInCourse(ctx context.Context, id int64) (int64, error) {
 	row := q.db.QueryRowContext(ctx, getNumberOfPersonsInCourse, id)
-	var number_of_persons interface{}
+	var number_of_persons int64
 	err := row.Scan(&number_of_persons)
 	return number_of_persons, err
-}
-
-const listChosenCoursesByCourseID = `-- name: ListChosenCoursesByCourseID :many
-SELECT id, person_id, course_id
-FROM chosen_courses
-WHERE course_id = ?
-ORDER BY id
-`
-
-func (q *Queries) ListChosenCoursesByCourseID(ctx context.Context, courseID int64) ([]ChosenCourse, error) {
-	rows, err := q.db.QueryContext(ctx, listChosenCoursesByCourseID, courseID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []ChosenCourse
-	for rows.Next() {
-		var i ChosenCourse
-		if err := rows.Scan(&i.ID, &i.PersonID, &i.CourseID); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const listChosenCoursesByPersonID = `-- name: ListChosenCoursesByPersonID :many
-SELECT id, person_id, course_id
-FROM chosen_courses
-WHERE person_id = ?
-ORDER BY id
-`
-
-func (q *Queries) ListChosenCoursesByPersonID(ctx context.Context, personID int64) ([]ChosenCourse, error) {
-	rows, err := q.db.QueryContext(ctx, listChosenCoursesByPersonID, personID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []ChosenCourse
-	for rows.Next() {
-		var i ChosenCourse
-		if err := rows.Scan(&i.ID, &i.PersonID, &i.CourseID); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
 }
 
 const listChosenReservedCoursesByCourseID = `-- name: ListChosenReservedCoursesByCourseID :many
@@ -339,6 +180,40 @@ func (q *Queries) ListChosenReservedCoursesByPersonID(ctx context.Context, perso
 	for rows.Next() {
 		var i ChosenReservedCourse
 		if err := rows.Scan(&i.ID, &i.PersonID, &i.CourseID); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listCourses = `-- name: ListCourses :many
+SELECT id, name, max_persons, created_at
+FROM courses
+ORDER BY name
+`
+
+func (q *Queries) ListCourses(ctx context.Context) ([]Course, error) {
+	rows, err := q.db.QueryContext(ctx, listCourses)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Course
+	for rows.Next() {
+		var i Course
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.MaxPersons,
+			&i.CreatedAt,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

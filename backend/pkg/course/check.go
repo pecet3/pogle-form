@@ -17,7 +17,7 @@ func (c Course) CheckIfIsPlace(courseID int64) bool {
 		logger.Error(err)
 		return false
 	}
-	if cc.MaxPersons > rp.(int64) {
+	if cc.MaxPersons > rp {
 		return true
 	}
 	return false
