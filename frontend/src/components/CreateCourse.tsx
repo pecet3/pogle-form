@@ -1,11 +1,12 @@
 import { useState } from "react";
+import { useAppContext } from "../contexts/AppContext";
 
 export const CreateCourse = () => {
   const [name, setName] = useState("");
   const [maxPersons, setMaxPersons] = useState("");
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-
+  const { setCourses } = useAppContext();
   const handleSubmit = async (event: any) => {
     event.preventDefault();
     setError("");
@@ -35,6 +36,8 @@ export const CreateCourse = () => {
         setSuccessMessage("Kurs został utworzony pomyślnie!");
         setName("");
         setMaxPersons("");
+        const data: Course = await response.json();
+        setCourses((prev) => [...prev, data]);
       } else {
         const errorData = await response.json();
         setError(errorData.message || "Wystąpił błąd podczas tworzenia kursu.");

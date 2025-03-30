@@ -27,7 +27,7 @@
                     text-sm font-bold mb-2">Warsztat:</label>
                     <select id="chosenCourse" name="chosenCourse" required
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        <option value="">Wybierzt</option>
+                        <option value="">Wybierz</option>
                         {{range .Courses}}
                         {{if .IsAvailable}}
                         <option value="{{.Course.ID}}">{{.Course.Name}}</option>

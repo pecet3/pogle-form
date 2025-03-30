@@ -33,5 +33,5 @@ func Run(
 	app.Srv.Handle(POST+"/courses", r.app.Auth.Authorize(r.handleCreateCourse))
 	app.Srv.Handle(GET+"/courses", r.app.Auth.Authorize(r.handleGetCourses))
 	app.Srv.HandleFunc(POST+"/persons", r.handleCreatePerson)
-
+	app.Srv.HandleFunc(GET+"/persons", r.handleGetPersons)
 }

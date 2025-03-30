@@ -8,14 +8,15 @@ SELECT *
 FROM courses
 ORDER BY name;
 
--- name: CreateCourse :execresult
+-- name: CreateCourse :one
 INSERT INTO courses (
   name,
   max_persons
 ) VALUES (
   ?,
   ?
-);
+)
+RETURNING *;
 
 -- name: UpdateCourse :execresult
 UPDATE courses

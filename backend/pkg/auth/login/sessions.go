@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	EXPIRY_DURATION  = time.Second * 60 * 2
+	EXPIRY_DURATION  = time.Second * 60 * 60 * 2
 	BLOCK_DURATION   = time.Second * 60 * 60
 	CLEANUP_DURATION = time.Second * 60 * 60
 )

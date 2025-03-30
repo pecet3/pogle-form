@@ -5,6 +5,7 @@ import { Home } from "./pages/Home";
 
 import { Auth } from "./pages/Auth";
 import { Courses } from "./pages/Courses";
+import { Persons } from "./pages/Persons";
 
 function App() {
   return (
@@ -19,10 +20,10 @@ function App() {
           }
         />
         <Route
-          path="/users"
+          path="/persons"
           element={
             <ProtectedPage>
-              <Home />
+              <Persons />
             </ProtectedPage>
           }
         />

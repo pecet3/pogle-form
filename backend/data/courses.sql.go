@@ -29,7 +29,7 @@ func (q *Queries) CreateChosenReservedCourse(ctx context.Context, arg CreateChos
 	return q.db.ExecContext(ctx, createChosenReservedCourse, arg.PersonID, arg.CourseID)
 }
 
-const createCourse = `-- name: CreateCourse :execresult
+const createCourse = `-- name: CreateCourse :one
 INSERT INTO courses (
   name,
   max_persons
@@ -37,6 +37,7 @@ INSERT INTO courses (
   ?,
   ?
 )
+RETURNING id, name, max_persons, created_at
 `
 
 type CreateCourseParams struct {
@@ -44,8 +45,16 @@ type CreateCourseParams struct {
 	MaxPersons int64  `json:"max_persons"`
 }
 
-func (q *Queries) CreateCourse(ctx context.Context, arg CreateCourseParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, createCourse, arg.Name, arg.MaxPersons)
+func (q *Queries) CreateCourse(ctx context.Context, arg CreateCourseParams) (Course, error) {
+	row := q.db.QueryRowContext(ctx, createCourse, arg.Name, arg.MaxPersons)
+	var i Course
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.MaxPersons,
+		&i.CreatedAt,
+	)
+	return i, err
 }
 
 const deleteChosenReservedCourse = `-- name: DeleteChosenReservedCourse :execresult

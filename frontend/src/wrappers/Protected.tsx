@@ -5,7 +5,8 @@ import { Loading } from "../components/Loading";
 import { Aside } from "../components/Aside";
 
 export const ProtectedPage = ({ children }: { children: React.ReactNode }) => {
-  const { user, setUser, courses, setCourses } = useAppContext();
+  const { user, setUser, courses, setCourses, persons, setPersons } =
+    useAppContext();
   const navigate = useNavigate();
 
   const fetchUser = async () => {
@@ -27,12 +28,26 @@ export const ProtectedPage = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const fetchPersons = async () => {
+    const result = await fetch("/api/persons");
+    if (result.ok) {
+      const data = await result.json();
+      setPersons(data);
+      console.log(data);
+    } else {
+      navigate("/auth");
+    }
+  };
+
   useEffect(() => {
     if (!user) {
       fetchUser();
     }
-    if (!courses) {
+    if (courses.length === 0) {
       fetchCourses();
+    }
+    if (persons.length === 0) {
+      fetchPersons();
     }
   }, []);
   return (

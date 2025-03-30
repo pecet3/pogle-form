@@ -15,13 +15,18 @@ func (r router) handleCreateCourse(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "", http.StatusBadRequest)
 		return
 	}
-	_, err := r.app.Data.CreateCourse(req.Context(), data.CreateCourseParams{
+	c, err := r.app.Data.CreateCourse(req.Context(), data.CreateCourseParams{
 		Name:       dto.Name,
 		MaxPersons: int64(dto.MaxPersons),
 	})
 	if err != nil {
 		logger.Error(err)
-		http.Error(w, "", http.StatusUnavailableForLegalReasons)
+		http.Error(w, "", http.StatusBadRequest)
+		return
+	}
+	if err := r.app.Dto.Send(w, c.ToDto(r.app.Data)); err != nil {
+		logger.Error(err)
+		http.Error(w, "", http.StatusBadRequest)
 		return
 	}
 	logger.Info("Created a new course: ", dto)

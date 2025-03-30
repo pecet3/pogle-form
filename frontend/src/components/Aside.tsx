@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 
 const pages = [
   { link: "/courses", title: "Warsztaty" },
-  { link: "/users", title: "Użytkownicy" },
+  { link: "/persons", title: "Osoby" },
 ];
 
 export const Aside = () => {
