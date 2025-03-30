@@ -17,6 +17,12 @@ func (r router) handleCreatePerson(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "", http.StatusBadRequest)
 		return
 	}
+	ep, _ := r.app.Data.GetPersonByEmail(req.Context(), sql.NullString{String: dto.Email, Valid: true})
+	if ep.ID > 0 {
+		logger.Error("user with provided email exists, email:", ep.Email.String)
+		http.Error(w, "", http.StatusUnavailableForLegalReasons)
+		return
+	}
 	p, err := r.app.Data.CreatePerson(req.Context(),
 		data.CreatePersonParams{
 			Email:    sql.NullString{String: dto.Email, Valid: true},

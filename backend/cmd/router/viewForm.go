@@ -20,6 +20,7 @@ type PageData struct {
 }
 
 func (r router) handleViewForm(w http.ResponseWriter, req *http.Request) {
+	logger.Info("Serving form")
 	coursesData := PageData{
 		Courses: []*CoursePage{},
 		Title:   os.Getenv("FORM_TITLE"),
@@ -38,7 +39,7 @@ func (r router) handleViewForm(w http.ResponseWriter, req *http.Request) {
 		}
 		coursesData.Courses = append(coursesData.Courses, cp)
 	}
-	tmpl, err := template.ParseFiles("static/course_register.html")
+	tmpl, err := template.ParseFiles(FORM_VIEW_DIR)
 	if err != nil {
 		logger.Error(err)
 		http.Error(w, "", http.StatusInternalServerError)

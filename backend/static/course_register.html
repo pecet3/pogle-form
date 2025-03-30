@@ -23,10 +23,11 @@
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 </div>
                 <div class="mb-4">
-                    <label for="chosenCourse" class="block text-gray-700 text-sm font-bold mb-2">Wybierz kurs:</label>
+                    <label for="chosenCourse" class="block text-gray-700 
+                    text-sm font-bold mb-2">Warsztat:</label>
                     <select id="chosenCourse" name="chosenCourse" required
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        <option value="">Wybierz kurs</option>
+                        <option value="">Wybierzt</option>
                         {{range .Courses}}
                         {{if .IsAvailable}}
                         <option value="{{.Course.ID}}">{{.Course.Name}}</option>
@@ -36,10 +37,10 @@
                 </div>
                 <div class="mb-4">
                     <label for="reservedCourse" class="block text-gray-700 text-sm font-bold mb-2">Zarezerwuj dodatkowy
-                        kurs (opcjonalnie):</label>
+                        Warsztat (opcjonalnie):</label>
                     <select id="reservedCourse" name="reservedCourse"
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        <option value="">Wybierz dodatkowy kurs</option>
+                        <option value="">Wybierz</option>
                         {{range .Courses}}
                         {{if .IsAvailable}}
                         <option value="{{.Course.ID}}">{{.Course.Name}}</option>
@@ -47,10 +48,13 @@
                         {{end}}
                     </select>
                 </div>
-                <button type="submit"
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                    Zapisz się
-                </button>
+                <div class="flex m-auto justify-center">
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 m-auto 
+                                         text-white font-bold py-2 px-4 rounded 
+                                         focus:outline-none focus:shadow-outline">
+                        Zapisz się
+                    </button>
+                </div>
             </form>
             <div id="registrationInfo" class="mt-4 px-6">
             </div>
@@ -85,8 +89,10 @@
                             displayRegistrationMessage();
 
                         } else {
-                            console.error('Błąd rejestracji:', response.status);
-                            displayRegistrationMessage('Błąd rejestracji. Spróbuj ponownie.');
+                            const msg = response.status == 451 
+                            ? "Osoba z podanym email już istnieje" 
+                            : 'Błąd rejestracji. Spróbuj ponownie.'
+                            displayRegistrationMessage(msg);
                         }
                     })
                     .catch(error => {

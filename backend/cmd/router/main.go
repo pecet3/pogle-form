@@ -12,7 +12,8 @@ const (
 	PUT    = "PUT " + PREFIX
 	DELETE = "DELETE " + PREFIX
 
-	VIEW_DIR = "./cmd/view"
+	ADMIN_VIEW_DIR = "static/dist"
+	FORM_VIEW_DIR  = "static/course_register.html"
 )
 
 type router struct {

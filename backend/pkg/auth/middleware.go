@@ -30,7 +30,7 @@ func (as *Auth) Authorize(next http.HandlerFunc, roles ...string) http.Handler {
 			http.Error(w, "", http.StatusInternalServerError)
 			return
 		}
-		if ls.Expiry.After(time.Now()) {
+		if ls.Expiry.Before(time.Now()) {
 			logger.Error("expired session")
 			http.Error(w, "", http.StatusInternalServerError)
 			return

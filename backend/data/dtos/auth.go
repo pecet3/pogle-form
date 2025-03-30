@@ -4,7 +4,7 @@ import "github.com/go-playground/validator/v10"
 
 type Login struct {
 	Name     string `json:"name" validate:"required,min=2,max=16,alphanumunicode"`
-	Password string `json:"email" validate:"required,max=64"`
+	Password string `json:"password" validate:"required,max=64"`
 }
 
 func (l Login) Validate(v *validator.Validate) error {
