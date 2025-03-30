@@ -56,5 +56,5 @@ func (r router) handleCreatePerson(w http.ResponseWriter, req *http.Request) {
 			Expires: time.Now().Add(time.Hour * 999),
 			Path:    "/",
 		})
-	logger.Debug(dto)
+	logger.Info("Created a new person: ", p)
 }

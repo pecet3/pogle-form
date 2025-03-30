@@ -1,5 +1,6 @@
-interface User {
-  created_at: time;
+interface Course {
+  id: number;
   name: string;
-  uuid: string;
+  max_persons: number;
+  registered_persons: number;
 }

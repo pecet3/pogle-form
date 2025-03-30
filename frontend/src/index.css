@@ -49,5 +49,5 @@ button:focus-visible {
 }
 
 .cartoon-container {
-  @apply w-full max-w-md bg-white border border-black p-6 rounded-md shadow-md flex flex-col gap-2
+  @apply w-full max-w-md flex flex-col items-center bg-white border border-black p-6 rounded-md shadow-md flex flex-col gap-2
 }

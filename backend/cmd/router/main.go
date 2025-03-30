@@ -28,8 +28,10 @@ func Run(
 		app: app,
 	}
 	authRouter.Run(app)
+	app.Srv.HandleFunc("GET /", r.handleViewForm)
 
+	app.Srv.Handle(POST+"/courses", r.app.Auth.Authorize(r.handleCreateCourse))
+	app.Srv.Handle(GET+"/courses", r.app.Auth.Authorize(r.handleGetCourses))
 	app.Srv.HandleFunc(POST+"/persons", r.handleCreatePerson)
 
-	app.Srv.HandleFunc("GET /", r.handleViewForm)
 }

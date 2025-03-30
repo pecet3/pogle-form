@@ -5,7 +5,7 @@ import { Loading } from "../components/Loading";
 import { Aside } from "../components/Aside";
 
 export const ProtectedPage = ({ children }: { children: React.ReactNode }) => {
-  const { user, setUser } = useAppContext();
+  const { user, setUser, courses, setCourses } = useAppContext();
   const navigate = useNavigate();
 
   const fetchUser = async () => {
@@ -17,9 +17,22 @@ export const ProtectedPage = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const fetchCourses = async () => {
+    const result = await fetch("/api/courses");
+    if (result.ok) {
+      const data = await result.json();
+      setCourses(data);
+    } else {
+      navigate("/auth");
+    }
+  };
+
   useEffect(() => {
     if (!user) {
       fetchUser();
+    }
+    if (!courses) {
+      fetchCourses();
     }
   }, []);
   return (
@@ -27,7 +40,9 @@ export const ProtectedPage = ({ children }: { children: React.ReactNode }) => {
       {user ? (
         <div className="flex">
           <Aside />
-          <main>{children}</main>
+          <main className=" mx-auto flex flex-col justify-start">
+            {children}
+          </main>
         </div>
       ) : (
         <div className="my-40">

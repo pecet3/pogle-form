@@ -4,6 +4,7 @@ import { ProtectedPage } from "./wrappers/Protected";
 import { Home } from "./pages/Home";
 
 import { Auth } from "./pages/Auth";
+import { Courses } from "./pages/Courses";
 
 function App() {
   return (
@@ -29,7 +30,7 @@ function App() {
           path="/courses"
           element={
             <ProtectedPage>
-              <Home />
+              <Courses />
             </ProtectedPage>
           }
         />
