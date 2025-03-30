@@ -8,9 +8,29 @@ import (
 	"database/sql"
 )
 
+type ChosenCourse struct {
+	ID       int64 `json:"id"`
+	PersonID int64 `json:"person_id"`
+	CourseID int64 `json:"course_id"`
+}
+
+type ChosenReservedCourse struct {
+	ID       int64 `json:"id"`
+	PersonID int64 `json:"person_id"`
+	CourseID int64 `json:"course_id"`
+}
+
+type Course struct {
+	ID         int64        `json:"id"`
+	Name       string       `json:"name"`
+	MaxPersons int64        `json:"max_persons"`
+	CreatedAt  sql.NullTime `json:"created_at"`
+}
+
 type Person struct {
-	ID        int64          `json:"id"`
-	Email     sql.NullString `json:"email"`
-	FullName  string         `json:"full_name"`
-	CreatedAt sql.NullTime   `json:"created_at"`
+	ID             int64          `json:"id"`
+	Email          sql.NullString `json:"email"`
+	FullName       string         `json:"full_name"`
+	ChosenCourseID int64          `json:"chosen_course_id"`
+	CreatedAt      sql.NullTime   `json:"created_at"`
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/pecet3/logger"
 )
 
-func (r router) handleView(w http.ResponseWriter, req *http.Request) {
+func (r router) handleViewAdmin(w http.ResponseWriter, req *http.Request) {
 	ip := utils.GetIP(req)
 	logger.Info("Serving react files for ip: ", ip)
 	fs := http.FileServer(http.Dir(VIEW_DIR))

@@ -5,5 +5,5 @@ import (
 )
 
 func (r router) handlePing(w http.ResponseWriter, req *http.Request) {
-	return
+	w.WriteHeader(http.StatusOK)
 }

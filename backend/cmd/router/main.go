@@ -1,6 +1,9 @@
 package router
 
-import "pogle-form/backend/cmd/repos"
+import (
+	"pogle-form/backend/cmd/repos"
+	authRouter "pogle-form/backend/cmd/router/auth"
+)
 
 const (
 	PREFIX = "/api"
@@ -23,8 +26,8 @@ func Run(
 	r := router{
 		app: app,
 	}
-	// authRouter.Run(app)
+	authRouter.Run(app)
 
-	app.Srv.HandleFunc("/", r.handleView)
-
+	app.Srv.HandleFunc("/", r.handleViewForm)
+	app.Srv.HandleFunc(POST+"/persons", r.handleCreatePerson)
 }

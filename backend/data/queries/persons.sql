@@ -1,29 +1,41 @@
+-- name: GetPerson :one
+SELECT *
+FROM persons
+WHERE id = ?;
+
+-- name: GetPersonByEmail :one
+SELECT *
+FROM persons
+WHERE email = ?;
+
+-- name: ListPersons :many
+SELECT *
+FROM persons
+ORDER BY full_name;
+
 -- name: CreatePerson :execresult
 INSERT INTO persons (
   email,
-  full_name
+  full_name,
+  chosen_course_id
 ) VALUES (
-  ?, ?
+  ?,
+  ?,
+  ?
 );
 
--- name: GetPerson :one
-SELECT * FROM persons
-WHERE id = ? LIMIT 1;
-
--- name: GetPersonByEmail :one
-SELECT * FROM persons
-WHERE email = ? LIMIT 1;
-
--- name: ListPersons :many
-SELECT * FROM persons
-ORDER BY full_name;
-
 -- name: UpdatePerson :execresult
-UPDATE persons SET
-  email = ?,
-  full_name = ?
+UPDATE persons
+SET email = ?,
+    full_name = ?,
+    chosen_course_id = ?
 WHERE id = ?;
 
 -- name: DeletePerson :execresult
 DELETE FROM persons
+WHERE id = ?;
+
+-- name: UpdatePersonChosenCourse :execresult
+UPDATE persons
+SET chosen_course_id = ?
 WHERE id = ?;

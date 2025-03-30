@@ -13,19 +13,23 @@ import (
 const createPerson = `-- name: CreatePerson :execresult
 INSERT INTO persons (
   email,
-  full_name
+  full_name,
+  chosen_course_id
 ) VALUES (
-  ?, ?
+  ?,
+  ?,
+  ?
 )
 `
 
 type CreatePersonParams struct {
-	Email    sql.NullString `json:"email"`
-	FullName string         `json:"full_name"`
+	Email          sql.NullString `json:"email"`
+	FullName       string         `json:"full_name"`
+	ChosenCourseID int64          `json:"chosen_course_id"`
 }
 
 func (q *Queries) CreatePerson(ctx context.Context, arg CreatePersonParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, createPerson, arg.Email, arg.FullName)
+	return q.db.ExecContext(ctx, createPerson, arg.Email, arg.FullName, arg.ChosenCourseID)
 }
 
 const deletePerson = `-- name: DeletePerson :execresult
@@ -38,8 +42,9 @@ func (q *Queries) DeletePerson(ctx context.Context, id int64) (sql.Result, error
 }
 
 const getPerson = `-- name: GetPerson :one
-SELECT id, email, full_name, created_at FROM persons
-WHERE id = ? LIMIT 1
+SELECT id, email, full_name, chosen_course_id, created_at
+FROM persons
+WHERE id = ?
 `
 
 func (q *Queries) GetPerson(ctx context.Context, id int64) (Person, error) {
@@ -49,14 +54,16 @@ func (q *Queries) GetPerson(ctx context.Context, id int64) (Person, error) {
 		&i.ID,
 		&i.Email,
 		&i.FullName,
+		&i.ChosenCourseID,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const getPersonByEmail = `-- name: GetPersonByEmail :one
-SELECT id, email, full_name, created_at FROM persons
-WHERE email = ? LIMIT 1
+SELECT id, email, full_name, chosen_course_id, created_at
+FROM persons
+WHERE email = ?
 `
 
 func (q *Queries) GetPersonByEmail(ctx context.Context, email sql.NullString) (Person, error) {
@@ -66,13 +73,15 @@ func (q *Queries) GetPersonByEmail(ctx context.Context, email sql.NullString) (P
 		&i.ID,
 		&i.Email,
 		&i.FullName,
+		&i.ChosenCourseID,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const listPersons = `-- name: ListPersons :many
-SELECT id, email, full_name, created_at FROM persons
+SELECT id, email, full_name, chosen_course_id, created_at
+FROM persons
 ORDER BY full_name
 `
 
@@ -89,6 +98,7 @@ func (q *Queries) ListPersons(ctx context.Context) ([]Person, error) {
 			&i.ID,
 			&i.Email,
 			&i.FullName,
+			&i.ChosenCourseID,
 			&i.CreatedAt,
 		); err != nil {
 			return nil, err
@@ -105,18 +115,40 @@ func (q *Queries) ListPersons(ctx context.Context) ([]Person, error) {
 }
 
 const updatePerson = `-- name: UpdatePerson :execresult
-UPDATE persons SET
-  email = ?,
-  full_name = ?
+UPDATE persons
+SET email = ?,
+    full_name = ?,
+    chosen_course_id = ?
 WHERE id = ?
 `
 
 type UpdatePersonParams struct {
-	Email    sql.NullString `json:"email"`
-	FullName string         `json:"full_name"`
-	ID       int64          `json:"id"`
+	Email          sql.NullString `json:"email"`
+	FullName       string         `json:"full_name"`
+	ChosenCourseID int64          `json:"chosen_course_id"`
+	ID             int64          `json:"id"`
 }
 
 func (q *Queries) UpdatePerson(ctx context.Context, arg UpdatePersonParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, updatePerson, arg.Email, arg.FullName, arg.ID)
+	return q.db.ExecContext(ctx, updatePerson,
+		arg.Email,
+		arg.FullName,
+		arg.ChosenCourseID,
+		arg.ID,
+	)
+}
+
+const updatePersonChosenCourse = `-- name: UpdatePersonChosenCourse :execresult
+UPDATE persons
+SET chosen_course_id = ?
+WHERE id = ?
+`
+
+type UpdatePersonChosenCourseParams struct {
+	ChosenCourseID int64 `json:"chosen_course_id"`
+	ID             int64 `json:"id"`
+}
+
+func (q *Queries) UpdatePersonChosenCourse(ctx context.Context, arg UpdatePersonChosenCourseParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, updatePersonChosenCourse, arg.ChosenCourseID, arg.ID)
 }
